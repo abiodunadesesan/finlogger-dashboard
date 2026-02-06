@@ -1,25 +1,63 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
 
-function App() {
+import Header from "./components/Header";
+import Overview from "./components/Overview";
+import ExpenseSummary from "./components/ExpenseSummary";
+import ExpenseDetails from "./components/ExpenseDetails";
+
+import { ExpenseModalProvider } from "./context/ExpenseModalContext";
+import { Container, Row } from "react-bootstrap";
+
+import { user } from "./data";
+import { useAppContext } from "./context/AppContext";
+
+function AppContent() {
+  const {
+    month,
+    expenseSummaryData,
+    expenseDetailsData,
+    totalExpenses,
+    setMonth,
+  } = useAppContext();
+
+  const handleMonthChange = (event) => {
+    setMonth(event.target.value);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header />
+
+      <ExpenseModalProvider>
+        <Container fluid="lg">
+          <div>
+            <Overview
+              month={month}
+              handleMonthChange={handleMonthChange}
+              totalExpenses={totalExpenses}
+              userIncome={user.income}
+            />
+          </div>
+
+          <Row className="tbl-container">
+            {expenseSummaryData ? (
+              <ExpenseSummary data={expenseSummaryData} />
+            ) : (
+              <div>Loading Expense Summary data...</div>
+            )}
+
+            {expenseDetailsData ? (
+              <ExpenseDetails data={expenseDetailsData} />
+            ) : (
+              <div>Loading Expense Details data...</div>
+            )}
+          </Row>
+        </Container>
+      </ExpenseModalProvider>
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  return <AppContent />;
+}
